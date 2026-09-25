@@ -1,11 +1,11 @@
 # Agent Skills Vault 🧠
 
-Enterprise Architectural Governance, Biomechanical Kinematics, Resilient Web Automation & Clean Backend Directives for Autonomous AI Coding Agents.
+The Complete Enterprise Knowledge Repository, Skill Codex (1,430+ Skills), and Master Agent Harness Runtime for Autonomous AI Coding Agents.
 
 ---
 
-## 📌 Mission & Architecture
-This vault acts as the centralized, immutable **Working Memory on Disk** for autonomous AI coding agents pair-programming across enterprise repositories:
+## 📌 Repository Purpose & Architecture
+This vault acts as the permanent, immutable **Working Memory on Disk** and execution harness for autonomous AI coding agents collaborating across enterprise projects:
 - **[sadik004/behavioral-playwright](https://github.com/sadik004/behavioral-playwright)**: Stealth behavioral browser automation, anti-bot evasion, and closed-loop process control.
 - **[sadik004/fastapi-clean-architecture](https://github.com/sadik004/fastapi-clean-architecture)**: 3-tier clean architecture, DSA optimization, and financial precision.
 
@@ -15,15 +15,20 @@ This vault acts as the centralized, immutable **Working Memory on Disk** for aut
 
 ```
 agent-skills-vault/
-├── skills/
-│   ├── scraping-production/
-│   │   └── SKILL.md          # 50 Master Guardrails, Kinematics, Swarms, Project 13
-│   ├── browser-automation/
-│   │   └── SKILL.md          # Lifecycle pooling, Route abortion, CDP isolation
-│   └── fastapi-production/
-│       └── SKILL.md          # 3-Tier Architecture, Strict Financial Math (Decimal), Zero Raw SQL
+├── harness/
+│   ├── README.md               # Master Agent Harness Architecture & Scaffolding
+│   ├── HARNESS_ARCHITECTURE.md # Execution runtime, tool dispatching & sandboxing
+│   └── runtime_bridge.py       # Safe subprocess execution & encoding normalization
+├── skills/                     # 1,430+ Production Skills
+│   ├── scraping-production/    # 50 Master Guardrails, Kinematics, Swarms, Project 13
+│   ├── browser-automation/     # Lifecycle pooling, Route abortion, CDP isolation
+│   ├── fastapi-production/     # 3-Tier Architecture, Strict Financial Math (Decimal), Zero Raw SQL
+│   ├── agent-harness/          # Agent Harness execution rules & scaffolding
+│   ├── biomechanics/           # Plamondon Log-Normal Kinematics & Tremor models
+│   ├── keystrokes/             # Polyphonic rollover & continuous Shift dynamics
+│   └── ... (1,430+ domain-specific engineering & scientific skills)
 ├── scripts/
-│   └── sync_skills.py        # Two-way sync engine between projects and global agent configs
+│   └── sync_skills.py          # Two-way sync engine between projects and global agent configs
 └── README.md
 ```
 
