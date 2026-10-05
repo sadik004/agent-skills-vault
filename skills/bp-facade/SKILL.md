@@ -2084,21 +2084,41 @@ def run_concurrent_harvest():
     return pd.DataFrame(all_leads)
 ```
 
+---
 
+## 5. Phase 7 & 8: Agentic Orchestration, Resilience & Master Integrity Gate
 
+### 1. Deterministic Multi-Step Orchestration
+- **Canonical Pipeline**: `PageSession → Resolver → Extraction → Mapping → Search → Verification → Resilience/Recovery`.
+- **`WorkflowOrchestrator`**:
+  ```python
+  from behavioral_playwright import (
+      WorkflowOrchestrator,
+      WorkflowDefinition,
+      WorkflowStep,
+      ActionType,
+      verify_workflow_result
+  )
 
+  orchestrator = WorkflowOrchestrator()
+  result = await orchestrator.execute_workflow(session, workflow_def)
+  verified = verify_workflow_result(result, session.session_id)
+  ```
+- **Loop Protection (`RunawayLoopError`)**:
+  - Halts execution if identical actions with identical arguments occur $\ge 3$ consecutive times (`max_repeated_actions = 3`).
+  - Halts execution if the page DOM hash remains static across $\ge 4$ consecutive state-mutating actions (`no_progress_window = 4`).
 
+### 2. Cryptographic Provenance Chaining (`WorkflowProvenanceChain`)
+- Every step lifecycle phase (`PLANNED`, `EXECUTED`, `OBSERVED`, `VERIFIED`, `RECOVERED`) generates an immutable `StepProvenanceRecord` signed via `HMAC-SHA256`.
+- `verify_chain_integrity()` strictly verifies `rec.workflow_id == self.workflow_id`, defending against cross-workflow record injection.
 
+### 3. Safe Recovery Taxonomy (`RecoveryManager`)
+- 13 distinct failure categories (`classify_failure()`).
+- In-place retry for transient timeouts with jittered exponential backoff.
+- Multi-flight single-lock restart recovery for `PAGE_FAILURE` / `BROWSER_FAILURE`.
+- Mandatory post-recovery live evaluation (`() => 2 + 2 == 4`) before entering `RecoveryState.RECOVERED`. Dead sessions fail to `RecoveryState.TERMINAL_FAILURE`.
 
-
-
-
-
-
-
-
-
-
-
-
-
+### 4. The Master Integrity Gate (`harness/gate.py`)
+- Independent out-of-process subprocess verification (`IndependentExternalVerifier`).
+- 26 Invariant Laws of System Integrity.
+- 100% Adversarial Mutation Kill Score (8/8 mutants killed).

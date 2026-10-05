@@ -26,3 +26,6 @@ graph TD
 - **Environment Abstraction:** Normalizes OS differences (Windows PowerShell vs. Linux Bash), UTF-8 vs CP1252 character encoding.
 - **Self-Healing Error Interception:** Automatically captures exception stack traces and feeds them back to context for self-correction.
 - **Quality Gate Verification:** Enforces terminal test runs with Exit Code 0 before declaring work complete.
+
+## 3. The Zero-Fraud Engineering Codex
+Refer to [ZERO_FRAUD_CODEX.md](./ZERO_FRAUD_CODEX.md) for the 26 Invariant Laws, trust boundary hierarchies, cryptographic provenance chains, and anti-fraud verification principles governing all agent executions.

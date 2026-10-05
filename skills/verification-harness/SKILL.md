@@ -10,7 +10,7 @@ description: Independent external verification, runtime provenance, cryptographi
 
 ---
 
-## 🏛️ The 20 Zero-Fraud Engineering Invariants (Binding Law)
+## 🏛️ The 26 Zero-Fraud Engineering Invariants (Binding Law)
 
 The verification harness is an unyielding, non-sycophantic quality barrier. It evaluates mathematical and runtime truth, completely independent of whether existing tests pass.
 
@@ -22,7 +22,7 @@ The verification harness is an unyielding, non-sycophantic quality barrier. It e
 6. **Explicit Gating for Absent Providers**: Missing dependencies (`patchright`, `browser-use`) must raise `ProviderUnavailableError` or return `PROVIDER_UNAVAILABLE`, never fabricate success or dummy responses.
 7. **Strict RNG Determinism**: Any method accepting `seed: int` must deterministically control all internal stochastic processes using isolated instances (`random.Random(traj_seed)`), never leaking to or from global state.
 8. **No Metric Impersonation**: Brier score is not ECE; static string generation is not runtime DOM evasion; synthetic simulated packets are not physical PCIe DMA events.
-9. **Mutation Score Hurdle**: The test suite must achieve $\ge 85\%$ kill rate against in-memory adversarial mutations before production approval.
+9. **Mutation Score Hurdle**: The test suite must achieve $\ge 85\%$ kill rate against in-memory adversarial mutations before production approval ($\ge 95\%$ for release, $100\%$ achieved in Phase 8).
 10. **Zero Raw SQL / In-Memory O(1) Lookups**: In-memory lookups must be strictly $O(1)$ (`dict`/`set`); zero quadratic scans.
 11. **Non-Destructive Observability**: Sniffers and metrics collectors must never alter intercepted response streams or introduce memory leaks.
 12. **Double-Entry Auditing for State**: State storage must record timestamps, depths, and statuses without mutating historical audit records.
@@ -34,6 +34,12 @@ The verification harness is an unyielding, non-sycophantic quality barrier. It e
 18. **Anti-Replay Nonce & Freshness Boundaries**: Previously verified evidence tokens cannot be replayed across runs; evidence must enforce strict timestamp freshness ($\Delta t < 60\text{s}$), out-of-process replay registries, and future-timestamp rejection.
 19. **Strict Prohibition of Arbitrary Sleeps**: `time.sleep`, `asyncio.sleep` with magic numbers, and `page.wait_for_timeout` are strictly banned; dynamic DOM mutation checks and event listeners are mandatory.
 20. **Zero Tautological Tests & Environment-Aware Provider Assertions**: Tautologies like `assert True` are classified as P0 fraud; optional modular providers must verify dynamic environment availability (`is Provider().is_available()`).
+21. **Session & Workflow Identity Binding**: Workflows and PageSessions must be explicitly bound. Mismatched session IDs (`workflow.session_id != session.session_id`) or session-less execution must immediately fail with `WorkflowIntegrityError`.
+22. **Zero Positional Ambiguity & Fallbacks**: Positional fallbacks (`.first()`, `.nth(0)`, `elements[0]`) on multi-element queries without explicit ranking metrics are strictly prohibited. Multi-match ambiguity must trigger resolution disambiguation or structured error.
+23. **Anti-Loop & Zero-Progress Protection**: Execution pipelines must enforce strict loop protection (`LoopProtector`, `RunawayLoopError`). Repeated identical action sequences ($N \ge 3$) or zero DOM state hash mutation windows ($M \ge 4$) must trip fail-safes immediately.
+24. **Mandatory Post-Recovery Live Verification**: Recovery attempts must actively verify the viability of the recovered target. A closed or dead session cannot be marked `RECOVERED`; it must terminate as `TERMINAL_FAILURE`.
+25. **100% Adversarial Mutation Hurdle**: The complete system must achieve 100% kill score against external adversarial mutants (including state bypass, signature forgery, silent exception masking, and identity spoofing).
+26. **Complete Phased Regression Invariant**: Across all phases (Phase 1 through Phase 8), all 560+ test suites and 140+ independent verification suites must run concurrently or in sequence with zero regressions, zero skipped required checks, and zero mocked core logic.
 
 ---
 
@@ -74,11 +80,44 @@ The verification harness is an unyielding, non-sycophantic quality barrier. It e
 - **The Vulnerability**: An attacker or failing worker replaying a previously signed, valid evidence bundle to falsely pass subsequent test runs or sessions.
 - **Enforcement**: Every evidence contract must feature a strictly unique `execution_id` and `session_id`. Verifiers must maintain an out-of-process consumed token registry that rejects previously observed IDs (`REPLAY_DETECTED`). Timestamps must strictly obey temporal freshness boundaries ($\Delta t < 60\text{s}$, with future timestamp rejection).
 
-### 7. Environment-Aware Provider Matrices (Zero Tautological / Fragile Tests)
-- **The Vulnerability**: Statically hardcoding `assert matrix['patchright'].installed is True` fails in environments without optional native binaries. Conversely, writing `assert True` (P0 WEAK-TEST) creates a meaningless tautology that hides interface regressions.
-- **Enforcement**:
-  1. Never write tautological assertions (`assert True`). Assert concrete interfaces, callable signatures, and exported symbol namespaces.
-  2. For modular optional providers, test dynamic capability detection (`assert matrix[name].installed is Provider().is_available()`) rather than making static, unverified assumptions about the host environment.
+### 8. Session & Workflow Identity Binding
+- **The Vulnerability**: Cross-session substitution where a workflow bound to Session A executes against Session B, or untracked worker tasks execute without session bindings.
+- **Enforcement**: Workflows must explicitly validate `session.session_id == workflow.session_id`. Any session-less execution or ID mismatch immediately raises `WorkflowIntegrityError`.
+
+### 9. Zero Positional Ambiguity & Fallbacks
+- **The Vulnerability**: Falling back to `.first()`, `.nth(0)`, or top-candidate selection when a selector matches multiple elements. In banking, checkout, or form filling, this mutates the wrong data entity.
+- **Enforcement**: Zero tolerance for positional fallbacks. Multiple ambiguous elements must trigger semantic disambiguation or raise `ElementResolutionError` immediately.
+
+### 10. Anti-Loop & Zero-Progress Protection (`LoopProtector`)
+- **The Vulnerability**: Autonomous agents entering infinite loops or repeatedly executing the same no-op action while claiming forward progress.
+- **Enforcement**: Dynamic tripwires that halt execution with `RunawayLoopError` if:
+  1. Identical actions with identical arguments occur $\ge 3$ consecutive times (`max_repeated_actions = 3`).
+  2. The page DOM hash remains static across $\ge 4$ consecutive state-mutating actions (`no_progress_window = 4`).
+
+### 11. Mandatory Post-Recovery Live Verification
+- **The Vulnerability**: Recovery routines catching crashes and returning `RECOVERED` without verifying that the reconstructed session or browser is physically alive and responsive.
+- **Enforcement**: Every recovery operation must actively execute a live health check (`() => 2 + 2 == 4`) against the target before declaring recovery success. If the session remains closed or dead, it must immediately transition to `TERMINAL_FAILURE`.
+
+### 12. Complete 15 Adversarial Attack Defenses
+The verification harness certifies immunity against 15 canonical fraud attack vectors:
+
+| Attack ID | Attack Vector | Hardened Architectural Countermeasure |
+| :--- | :--- | :--- |
+| **ATTACK-P8-001** | Return `True` without execution | `WorkflowOrchestrator` checks `not workflow.steps` and raises `ExecutionError`. |
+| **ATTACK-P8-002** | Forge `WorkflowResult` with fake success | `validate_integrity()` checks non-empty provenance; `WorkflowVerifier` audits HMAC. |
+| **ATTACK-P8-003** | Forge verification result | `WorkflowProvenanceChain` recalculates SHA-256 evidence digests against signed HMAC. |
+| **ATTACK-P8-004** | Stale evidence replay | `WorkflowVerifier` computes `freshness_delta_s = abs(now - ev_time)`; rejects if $> 60\text{s}$. |
+| **ATTACK-P8-005** | Forge session identity | `WorkflowOrchestrator` verifies `session.session_id == workflow.session_id`. |
+| **ATTACK-P8-006** | Forge workflow identity | `verify_chain_integrity()` strictly verifies `rec.workflow_id == self.workflow_id`. |
+| **ATTACK-P8-007** | Replace evidence artifact | Cryptographic hash binding in provenance record invalidates chain on modified data. |
+| **ATTACK-P8-008** | Zero-progress state mutation | `WorkflowVerifier` verifies that state-mutating actions produce non-zero DOM hash delta. |
+| **ATTACK-P8-009** | Fake browser/page object | `WorkflowExecutor` checks session presence and interfaces; raises typed `ExecutionError`. |
+| **ATTACK-P8-010** | Forge MCP response | MCP tool handler executes through authoritative framework and serializes verified result. |
+| **ATTACK-P8-011** | Planner declares success | Planner only returns proposals with `StepStatus.PENDING`; zero authority to set status. |
+| **ATTACK-P8-012** | Executor declares success on empty | `WorkflowVerifier` explicitly rejects `result is None` or empty payloads without approval. |
+| **ATTACK-P8-013** | Recovery declares success on dead target | Dead session recovery fails live verification and enters `TERMINAL_FAILURE`. |
+| **ATTACK-P8-014** | Direct tool bypass of policies | `ApprovalManager` forces approval ticket generation; execution halts with `ApprovalRequiredError`. |
+| **ATTACK-P8-015** | Cross-session evidence substitution | `verify_workflow_result()` evaluates `result.session_id == expected_session_id`. |
 
 ---
 
